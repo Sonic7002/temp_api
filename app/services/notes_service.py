@@ -9,7 +9,7 @@ from ..models.note import Note
 from ..db.file_client import supabase
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB (increased for MP4 support)
-BUCKET_NAME = "studysprint_notes"
+BUCKET_NAME = "temp"
 
 ALLOWED_MIME_TYPES = {
     "application/pdf": ".pdf",
@@ -37,34 +37,37 @@ class NoteService:
 
         return expected_ext
 
-    def create_notes(self, data: NotesCreate, file: UploadFile, db: Session) -> Note:
-        # 1. Validate file format before DB mutations
-        ext = self._validate_and_get_extension(file)
-
-        # 2. Create DB record to generate unique ID
+    def create_notes(self, data: NotesCreate, db: Session, file: UploadFile | None = None) -> Note:
+        # 1. Create DB record to generate unique ID
         note = self.repo.create(db, data)
-        storage_key = f"{note.id}{ext}"
+        if not note:
+            return None
 
-        # 3. Upload file to Supabase storage
-        try:
-            file_bytes = file.file.read()
-            if len(file_bytes) > MAX_FILE_SIZE:
-                raise ValueError("File content exceeds 50MB limit")
+        if file:
+            # 2. Validate file format before storage upload
+            ext = self._validate_and_get_extension(file)
+            storage_key = f"{note.id}{ext}"
 
-            supabase.storage.from_(BUCKET_NAME).upload(
-                path=storage_key,
-                file=file_bytes,
-                file_options={"content-type": file.content_type}
-            )
-        except Exception as err:
-            # Clean up repo state if storage upload fails
-            self.repo.delete(db, note.id)
-            db.rollback()
-            raise ValueError(f"File upload failed: {err}") from err
+            # 3. Upload file to Supabase storage
+            try:
+                file_bytes = file.file.read()
+                if len(file_bytes) > MAX_FILE_SIZE:
+                    raise ValueError("File content exceeds 50MB limit")
 
-        # Save optional file metadata (like extension/storage key) to note record
-        note.file_extension = ext
-        return self.repo.save(db, note)
+                supabase.storage.from_(BUCKET_NAME).upload(
+                    path=storage_key,
+                    file=file_bytes,
+                    file_options={"content-type": file.content_type}
+                )
+                note.file_extension = ext
+                return self.repo.save(db, note)
+            except Exception as err:
+                # Clean up repo state if storage upload fails
+                self.repo.delete(db, note.id)
+                db.rollback()
+                raise ValueError(f"File upload failed: {err}") from err
+
+        return note
 
     def get_by_id(self, note_id: UUID, db: Session) -> Note | None:
         return self.repo.get_by_id(db, note_id)

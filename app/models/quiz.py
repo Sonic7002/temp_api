@@ -4,7 +4,6 @@ from sqlalchemy import String, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from ..db.base import Base
-from ..core.security import hash_password
 
 class Quiz(Base):
     __tablename__ = "quizes"
@@ -17,7 +16,7 @@ class Quiz(Base):
     opC: Mapped[str] = mapped_column(String, nullable=False)
     opD: Mapped[str] = mapped_column(String, nullable=False)
     answer: Mapped[str] = mapped_column(String(300), nullable=False)
-    difficulty:  Mapped[str] = mapped_column(String(300), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable = False)
+    difficulty: Mapped[str] = mapped_column(String(300), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-user = relationship("Note")
+    note = relationship("Note")

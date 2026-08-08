@@ -11,6 +11,6 @@ class Attempt(Base):
     id: Mapped[PyUUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     notes_id: Mapped[list[PyUUID]] = mapped_column(ARRAY(UUID))
     user_id: Mapped[PyUUID] = mapped_column(ForeignKey("users.id"), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable = False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-user = relationship("User")
+    user = relationship("User")

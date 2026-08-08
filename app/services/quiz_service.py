@@ -37,3 +37,7 @@ class QuizService:
             raise ValueError("Quiz not found")
         self.repo.delete(db, quiz_id)
         return quiz
+
+    def get_quizzes_for_notes(self, note_ids: list[UUID], db: Session, limit: int = 10) -> list[Quiz]:
+        quizzes = self.repo.get_by_note_ids(db, note_ids)
+        return quizzes[:limit]

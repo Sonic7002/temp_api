@@ -8,7 +8,7 @@ class NoteRepo:
     def create(self, db: Session, data: NotesCreate) -> Note | None:
         note = Note(title = data.title, class_id = data.class_id)
         try:
-            db.add()
+            db.add(note)
             db.commit()
             db.refresh(note)
             return note
@@ -31,3 +31,10 @@ class NoteRepo:
             return note
         except IntegrityError:
             raise ValueError("conflict in database rules")
+
+    def delete(self, db: Session, note_id: UUID) -> Note | None:
+        note = self.get_by_id(db, note_id)
+        if note:
+            db.delete(note)
+            db.commit()
+        return note

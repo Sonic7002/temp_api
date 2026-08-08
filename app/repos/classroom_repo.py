@@ -8,7 +8,7 @@ class ClassRepo:
     def create(self, db: Session, data: ClassroomCreate, user_id: UUID) -> Classroom | None:
         classroom = Classroom(title = data.title, user_id = user_id)
         try:
-            db.add()
+            db.add(classroom)
             db.commit()
             db.refresh(classroom)
             return classroom

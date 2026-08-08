@@ -8,7 +8,7 @@ class AttemptRepo:
     def create(self, db: Session, user_id: UUID, data: AttemptCreate) -> Attempt | None:
         attempt = Attempt(user_id = user_id, notes_id = data.notes_id)
         try:
-            db.add()
+            db.add(attempt)
             db.commit()
             db.refresh(attempt)
             return attempt
@@ -24,10 +24,10 @@ class AttemptRepo:
     def list_all(self, db: Session) -> list[Attempt]:
         return db.query(Attempt).all()
 
-    def save(self, db: Session, attepmt: Attempt) -> Attempt:
+    def save(self, db: Session, attempt: Attempt) -> Attempt:
         try:
             db.commit()
-            db.refresh(Attempt)
-            return Attempt
+            db.refresh(attempt)
+            return attempt
         except IntegrityError:
             raise ValueError("conflict in database rules")

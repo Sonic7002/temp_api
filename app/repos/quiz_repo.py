@@ -6,11 +6,20 @@ from ..schemas.quiz import QuizCreate
 
 class QuizRepo:
     def create(self, db: Session, data: QuizCreate) -> Quiz | None:
-        quiz = Quiz(question = data.question, opA = data.opA, opB = data.opB, opC = data.opC, opD = data.opD, answer = data.answer, difficulty = data.difficulty)
+        quiz = Quiz(
+            note_id = data.note_id,
+            question = data.question,
+            opA = data.opA,
+            opB = data.opB,
+            opC = data.opC,
+            opD = data.opD,
+            answer = data.answer,
+            difficulty = data.difficulty
+        )
         try:
-            db.add()
+            db.add(quiz)
             db.commit()
-            db.refresh()
+            db.refresh(quiz)
             return quiz
         except IntegrityError:
             return None
@@ -18,8 +27,12 @@ class QuizRepo:
     def get_by_id(self, db: Session, quiz_id: UUID) -> Quiz | None:
         return db.query(Quiz).filter(Quiz.id == str(quiz_id)).first()
 
-    def get_by_note_id(self, db: Session, note_id: UUID) -> list[Quiz] | None:
+    def get_by_note_id(self, db: Session, note_id: UUID) -> list[Quiz]:
         return db.query(Quiz).filter(Quiz.note_id == str(note_id)).all()
+
+    def get_by_note_ids(self, db: Session, note_ids: list[UUID]) -> list[Quiz]:
+        string_ids = [str(nid) for nid in note_ids]
+        return db.query(Quiz).filter(Quiz.note_id.in_(string_ids)).all()
         
     def list_all(self, db: Session) -> list[Quiz]:
         return db.query(Quiz).all()
