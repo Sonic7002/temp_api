@@ -9,7 +9,6 @@ class UserRole(str, Enum):
     STUDENT = "STUDENT"
 
 class UserCreate(BaseModel):
-    id: UUID
     name: str
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
