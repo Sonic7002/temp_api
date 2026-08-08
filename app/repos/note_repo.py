@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from ..models.note import Note
 from ..schemas.note import NotesCreate
 
-class ClassRepo:
+class NoteRepo:
     def create(self, db: Session, data: NotesCreate) -> Note | None:
         note = Note(title = data.title, class_id = data.class_id)
         try:
@@ -18,7 +18,7 @@ class ClassRepo:
     def get_by_id(self, db: Session, note_id: UUID) -> Note | None:
         return db.query(Note).filter(Note.id == str(note_id)).first()
 
-    def get_by_user_id(self, db: Session, classroom_id: UUID) -> list[Note] | None:
+    def get_by_class_id(self, db: Session, classroom_id: UUID) -> list[Note] | None:
         return db.query(Note).filter(Note.class_id == str(classroom_id)).all()
         
     def list_all(self, db: Session) -> list[Note]:

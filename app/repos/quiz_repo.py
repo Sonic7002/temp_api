@@ -31,3 +31,10 @@ class QuizRepo:
             return note
         except IntegrityError:
             raise ValueError("conflict in database rules")
+
+    def delete(self, db: Session, quiz_id: UUID) -> Quiz | None:
+        quiz = self.get_by_id(db, quiz_id)
+        if quiz:
+            db.delete(quiz)
+            db.commit()
+        return quiz

@@ -31,3 +31,9 @@ class ClassRepo:
             return classroom
         except IntegrityError:
             raise ValueError("conflict in database rules")
+
+    def delete(self, db: Session, classroom_id: UUID):
+        classroom = self.get_by_id(db, classroom_id)
+        db.delete(classroom)
+        db.commit()
+        return classroom
