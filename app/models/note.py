@@ -4,7 +4,6 @@ from sqlalchemy import String, DateTime, func, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID
 from ..db.base import Base
-from ..core.security import hash_password
 
 class Note(Base):
     __tablename__ = "notes"

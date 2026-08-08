@@ -8,4 +8,5 @@ class AttemptCreate(BaseModel):
 class AttemptRead(BaseModel):
     id: UUID
     notes_id: list[UUID]
+    user_id: UUID
     created_at: datetime

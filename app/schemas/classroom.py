@@ -5,7 +5,6 @@ from typing import Optional
 
 class ClassroomCreate(BaseModel):
     title: str
-    user_id: UUID
 
     @field_validator("title")
     @classmethod
