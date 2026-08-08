@@ -150,7 +150,7 @@ Once running, access:
 
 ## API Reference Overview
 
-All API v1 routes are available under `/api/v1` (and `/v1`).
+All API v1 routes are available under `/api/v1`.
 
 ### 1. Root & Health Check
 | Method | Endpoint | Description | Access |

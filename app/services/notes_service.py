@@ -4,12 +4,12 @@ from fastapi import UploadFile
 from sqlalchemy.orm import Session
 
 from ..repos.note_repo import NoteRepo
-from ..schemas.note import NotesCreate, NotesPatch
+from ..schemas.note import NotesPatch, NotesCreate
 from ..models.note import Note
 from ..db.file_client import supabase
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB (increased for MP4 support)
-BUCKET_NAME = "temp"
+BUCKET_NAME = "notes"
 
 ALLOWED_MIME_TYPES = {
     "application/pdf": ".pdf",
@@ -37,7 +37,7 @@ class NoteService:
 
         return expected_ext
 
-    def create_notes(self, data: NotesCreate, db: Session, file: UploadFile | None = None) -> Note:
+    def create_notes(self, data: NotesCreate, db: Session, file: UploadFile) -> Note:
         # 1. Create DB record to generate unique ID
         note = self.repo.create(db, data)
         if not note:

@@ -11,7 +11,7 @@ class UserRole(str, Enum):
 class UserCreate(BaseModel):
     name: str
     email: EmailStr
-    password: str = Field(min_length=8, max_length=128)
+    password: str = Field(min_length=8, max_length=72)
     role: UserRole
 
     @field_validator("name")

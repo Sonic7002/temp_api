@@ -16,7 +16,7 @@ class ClassroomCreate(BaseModel):
 class ClassroomRead(BaseModel):
     id: UUID
     title: str
-    user_id: str
+    user_id: UUID
     created_at: datetime
 
 class ClassroomPatch(BaseModel):
