@@ -1,8 +1,8 @@
-from pydantic import BaseModel, field_validator, ValidationInfo
+from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+
 
 class State(str, Enum):
     CORRECT = "CORRECT"

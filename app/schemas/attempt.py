@@ -1,7 +1,6 @@
-from pydantic import BaseModel, field_validator, ValidationInfo
+from pydantic import BaseModel
 from uuid import UUID
 from datetime import datetime
-from typing import Optional
 
 class AttemptCreate(BaseModel):
     notes_id: list[UUID]
