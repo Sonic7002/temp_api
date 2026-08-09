@@ -7,6 +7,7 @@ from ..repos.note_repo import NoteRepo
 from ..schemas.note import NotesPatch, NotesCreate
 from ..models.note import Note
 from ..db.file_client import supabase
+import requests
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB (increased for MP4 support)
 BUCKET_NAME = "notes"
@@ -37,6 +38,18 @@ class NoteService:
 
         return expected_ext
 
+    def create_topic(name: str):
+        url = "http://localhost:8000/api/topics"
+
+        data = {
+            "name": name
+        }
+
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+
+        return response.json()
+
     def create_notes(self, data: NotesCreate, db: Session, file: UploadFile) -> Note:
         # 1. Create DB record to generate unique ID
         note = self.repo.create(db, data)
@@ -60,7 +73,11 @@ class NoteService:
                     file_options={"content-type": file.content_type}
                 )
                 note.file_extension = ext
-                return self.repo.save(db, note)
+                
+                final = self.repo.save(db, note)
+                self.create_topic(str(final.id))
+                return final
+            
             except Exception as err:
                 # Clean up repo state if storage upload fails
                 self.repo.delete(db, note.id)

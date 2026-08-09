@@ -3,14 +3,33 @@ from sqlalchemy.orm import Session
 from ..models.user import User
 from ..repos.user_repo import UserRepo
 from ..schemas.user import UserCreate, UserPatch
+import requests
 
 class UserService:
     def __init__(self, repo: UserRepo):
         self.repo = repo
 
+    
+
+
+    def create_student(name: str, email: str):
+        url = "http://localhost:8000/api/students"
+
+        data = {
+            "name": name,
+            "email": email
+        }
+
+        response = requests.post(url, json=data)
+
+        response.raise_for_status()
+
+        return response.json()
+
     def create_user(self, data: UserCreate, db: Session) -> User:
         user = self.repo.create(db, data)
         if user:
+            self.create_student(data.name, data.email)
             return user
         raise ValueError("email already exists")
 

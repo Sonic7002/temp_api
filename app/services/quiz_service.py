@@ -2,14 +2,58 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 from ..models.quiz import Quiz
 from ..repos.quiz_repo import QuizRepo
-from ..schemas.quiz import QuizCreate, QuizPatch
+from ..schemas.quiz import QuizCreate, QuizPatch, Difficulty, Answer
+import requests
 
 class QuizService:
     def __init__(self, repo: QuizRepo):
         self.repo = repo
 
+    def create_question(topic_id: str, text: str, options: list[str], correct_option: int, difficulty: float):
+        url = f"http://localhost:8000/api/topics/{topic_id}/questions"
+
+        data = {
+            "text": text,
+            "options": options,
+            "correctOption": correct_option,
+            "difficulty": difficulty
+        }
+
+        response = requests.post(url, json=data)
+        response.raise_for_status()
+
+        return response.json()
+
+    def difficulty_to_float(difficulty: Difficulty) -> float:
+        mapping = {
+        Difficulty.EASY: 0.1,
+        Difficulty.MEDIUM: 0.5,
+        Difficulty.HARD: 0.9,
+        }
+
+        return mapping[difficulty]
+
+
+    def answer_to_int(answer: Answer) -> int:
+        mapping = {
+            Answer.A: 0,
+            Answer.B: 1,
+            Answer.C: 2,
+            Answer.D: 3,
+        }
+
+        return mapping[answer]
+
     def create_quiz(self, data: QuizCreate, db: Session) -> Quiz | None:
-        return self.repo.create(db, data)
+        quiz = self.repo.create(db, data)
+        
+        self.create_question(str(quiz.id),
+        quiz.question,
+        [quiz.opA, quiz.opB, quiz.opC, quiz.opD],
+        self.answer_to_int(quiz.answer),
+        self.difficulty_to_float(quiz.difficulty))
+
+        return quiz
 
     def get_by_id(self, quiz_id: UUID, db: Session) -> Quiz | None:
         return self.repo.get_by_id(db, quiz_id)
